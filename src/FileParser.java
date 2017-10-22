@@ -16,9 +16,9 @@ public class FileParser {
         File file = new File(fileName);
 
         Scanner input = new Scanner(file);
+        int index = -1;
 
         while(input.hasNext()) {
-            int index = -1;
             String nextLine = input.nextLine();
             if(nextLine.contains("#")) {
                 index++;
@@ -26,21 +26,27 @@ public class FileParser {
                 switch (index) {
                     case 0: //id
                         asId = Integer.parseInt(nextLine);
+                        System.out.println(nextLine);
                         break;
                     case 1: //port
                         asPort = Integer.parseInt(nextLine);
+                        System.out.println(nextLine);
                         break;
                     case 2: //ip
                         asIp = nextLine;
+                        System.out.println(nextLine);
                         break;
                     case 3: //known networks
                         knownSubnetworks.add(nextLine);
+                        System.out.println(nextLine);
                         break;
                     case 4: //BGP neighbors
                         bgpNetworks.add(nextLine);
+                        System.out.println(nextLine);
                         break;
                     case 5: //listen neigbors
                         listenNeighbors = Integer.parseInt(nextLine);
+                        System.out.println(nextLine);
                         break;
                 }
             }
@@ -51,5 +57,14 @@ public class FileParser {
         input.close();
 
         return createdAs;
+    }
+
+    public static void main(String[] args) {
+        FileParser fileParser = new FileParser();
+        try {
+            fileParser.createAS("hola.txt");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
