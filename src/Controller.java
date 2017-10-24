@@ -1,12 +1,23 @@
 import com.sun.deploy.util.StringUtils;
 
-public class Controller implements Runnable {
+public class Controller {
 
-    //AS autonomousSystem;
+    // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
+    public static void main(String[] args) {
+        Controller controller = new Controller(args[0]);
+        //controller.listenToTerminal();
+    }
+
+    As autonomousSystem;
+    private final String ADDRESS_FORMAT = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
 
     Controller(String fileName) {
-        //FileParser parser = new FileParser();
-        //this.autonomousSystem= parser.createAS();
+        FileParser parser = new FileParser();
+        try {
+           autonomousSystem = parser.createAS(fileName);
+        } catch (Exception e) {
+            System.err.println("Error parsing the file " + fileName);
+        }
     }
 
     private void listenToTerminal() {
@@ -16,6 +27,8 @@ public class Controller implements Runnable {
             command = command.trim().replaceAll(" +", " ");  // removes unwanted whitespace
             parseCommand(command);
         }
+        // the "stop" command was used
+        this.autonomousSystem.stop();
     }
 
     private void parseCommand(String command) {
@@ -24,7 +37,12 @@ public class Controller implements Runnable {
         } else if (command.equals("start")) {
             this.startCommand();
         } else if(command.startsWith("add ") && command.split(" ").length == 2) { //whitespace at the end to ensure that a parameter is present (string is trimmed)
-            this.addSubnetCommand(command.split(" ")[1]);  //sends only the address as parameter
+            String ipAddress = command.split(" ")[1];
+            if (ipAddress.matches(ADDRESS_FORMAT)) {
+                this.addSubnetCommand(ipAddress);  //sends only the address as parameter
+            } else {
+                System.out.println("Invalid input ip address: " + ipAddress);
+            }
         } else if (command.equals("show routes")) {
             this.showRoutesCommand();
         } else {
@@ -32,12 +50,8 @@ public class Controller implements Runnable {
         }
     }
 
-    public void run() {
-        this.listenToTerminal();
-    }
-
     private void startCommand() {
-        //this.autonomousSystem.start();
+        this.autonomousSystem.start();
     }
 
     private void helpCommand() {
@@ -45,10 +59,14 @@ public class Controller implements Runnable {
     }
 
     private void showRoutesCommand() {
-        //this.autonomousSystem.showRoutes();
+        this.autonomousSystem.showRoutes();
     }
 
     private void addSubnetCommand(String subnet) {
-        //this.autonomousSystem.addSubNetwork();
+        this.autonomousSystem.addSubNetwork(subnet);
+    }
+
+    private void stopCommand() {
+        this.autonomousSystem.stop();
     }
 }
