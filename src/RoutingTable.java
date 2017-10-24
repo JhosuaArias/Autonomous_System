@@ -72,13 +72,10 @@ public class RoutingTable {
 
             for (String[] path : possiblePaths) {
 
-                if (path.length > 0) {
+                if (path.length > 0 && path[path.length-1].equals(asID)) {
 
+                    
 
-
-                } else {
-                    System.err.println("An unvalid path was detected!!");
-                    System.exit(1);
                 }
 
             }
