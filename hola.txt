@@ -1,9 +1,5 @@
 #As id
 1
-#As port
-666
-#As IP
-10.1.0.0
 #Redes conocidas
 82.21.0.0
 121.11.3.0

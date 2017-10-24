@@ -28,23 +28,15 @@ public class FileParser {
                         asId = Integer.parseInt(nextLine);
                         System.out.println(nextLine);
                         break;
-                    case 1: //port
-                        asPort = Integer.parseInt(nextLine);
-                        System.out.println(nextLine);
-                        break;
-                    case 2: //ip
-                        asIp = nextLine;
-                        System.out.println(nextLine);
-                        break;
-                    case 3: //known networks
+                    case 1: //known networks
                         knownSubnetworks.add(nextLine);
                         System.out.println(nextLine);
                         break;
-                    case 4: //BGP neighbors
+                    case 2: //BGP neighbors
                         bgpNetworks.add(nextLine);
                         System.out.println(nextLine);
                         break;
-                    case 5: //listen neigbors
+                    case 3: //listen neigbors
                         listenNeighbors = Integer.parseInt(nextLine);
                         System.out.println(nextLine);
                         break;
