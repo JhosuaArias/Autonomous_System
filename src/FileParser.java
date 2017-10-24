@@ -21,6 +21,7 @@ public class FileParser {
 
         while(input.hasNext()) {
             String nextLine = input.nextLine();
+
             nextLine = nextLine.trim();
             nextLine = nextLine.replace(" ","");
             if (!nextLine.isEmpty()) {
