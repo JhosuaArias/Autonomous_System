@@ -6,10 +6,10 @@ public class As {
     private int id;
     private int port;
     private ArrayList<String> knownSubnetworks;
-    private HashMap<String, String> bgpNeighbors;
+    private HashMap<String, Integer> bgpNeighbors;
     private RoutingTable routingTable;
 
-    public As(int id, int port, ArrayList<String> knownSubnetworks, HashMap<String, String> bgpNeighbors) {
+    public As(int id, int port, ArrayList<String> knownSubnetworks, HashMap<String, Integer> bgpNeighbors) {
         this.id = id;
         this.port = port;
         this.knownSubnetworks = knownSubnetworks;
