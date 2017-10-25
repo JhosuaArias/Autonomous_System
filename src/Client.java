@@ -42,6 +42,9 @@ public class Client extends Thread{
         System.out.println("server says:" + br.readLine());
     }
 
+    public void kill() {
+        this.stop();
+    }
 
     @Override
     public void run() {
@@ -56,6 +59,7 @@ public class Client extends Thread{
             }
         }
     }
+
 
 
     public static void main(String[] args) {

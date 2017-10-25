@@ -37,6 +37,13 @@ public class Server extends Thread{
         }
     }
 
+    public void kill() {
+        for (ServerConnection connection: this.allConnections) {
+            connection.stop();
+        }
+        this.stop();
+    }
+
     @Override
     public void run(){
         System.out.println("Server on...");
