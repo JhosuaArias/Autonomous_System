@@ -39,10 +39,14 @@ public class Server extends Thread{
 
     @Override
     public void run(){
+        System.out.println("Server on...");
         while (true) {
             this.listenConnections();
         }
     }
 
-
+    public static void main(String[] args) {
+        Server server = new Server(new As(1,1,null,null),81);
+        server.start();
+    }
 }

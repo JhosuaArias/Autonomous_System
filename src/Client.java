@@ -34,10 +34,10 @@ public class Client extends Thread{
 
         System.out.println("server says:" + br.readLine());
 
-        BufferedReader userInputBR = new BufferedReader(new InputStreamReader(System.in));
-        String userInput = userInputBR.readLine();
+        /*BufferedReader userInputBR = new BufferedReader(new InputStreamReader(System.in));
+        String userInput = userInputBR.readLine();*/
         //TODO UNCOMMENT WHEN THE METHOD EXISTS
-       // out.println(as.generateUpdateMessage());
+        out.println(as.generateUpdateMessage());
 
         System.out.println("server says:" + br.readLine());
     }
@@ -50,7 +50,7 @@ public class Client extends Thread{
 
             try {
                 this.sendMessage();
-                Thread.sleep(30000);
+                Thread.sleep(3000);
             } catch (InterruptedException|IOException e) {
                 retry = false;
             }
@@ -59,7 +59,7 @@ public class Client extends Thread{
 
 
     public static void main(String[] args) {
-        Client client = new Client(null,"localhost",81);
+        Client client = new Client(new As(1,1,null,null),"localhost",81);
         client.start();
     }
 }
