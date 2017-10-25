@@ -96,7 +96,7 @@ public class RoutingTable {
      * @param receiverAS
      * @return
      */
-    public String generateUpdateMessage (String receiverAS) {
+    public String generateUpdateMessage (String receiverAS, String currAS) {
         String message = "";
 
         for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
@@ -109,7 +109,7 @@ public class RoutingTable {
                 for (int i = 0; i < path.length; i++) {
                     message += path[i] + "-";
                 }
-                message = message.substring(0, message.length() - 1);
+                message += currAS;
 
 
                 message += ",";
@@ -127,16 +127,26 @@ public class RoutingTable {
      */
     public String print () {
         String result = "";
+        int counter;
 
         for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
             result += entry.getKey() + ":\n";
+            counter = 0;
 
             for (String[] path : entry.getValue()) {
                 result += "------------ ";
                 for (int i = 0; i < path.length; i++) {
                     result += path[i] + " - ";
                 }
-                result = result.substring(0, result.length() - 2 );
+
+                if (path.length > 0) {
+                    result = result.substring(0, result.length() - 2);
+                }
+                if (counter == 0) {
+                    result += " *";
+                }
+
+                counter++;
                 result += "\n";
             }
             result += "\n";
