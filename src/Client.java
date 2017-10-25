@@ -46,7 +46,7 @@ public class Client extends Thread{
     @Override
     public void run() {
         boolean retry = true;
-        while (retry){
+        while (true){
 
             try {
                 this.sendMessage();

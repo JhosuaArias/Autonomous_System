@@ -31,7 +31,7 @@ public class Server extends Thread{
                 allConnections.add(serverConnection);
                 serverConnection.start();
             } catch (IOException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
 
         }

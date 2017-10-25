@@ -47,9 +47,9 @@ public class ServerConnection extends Thread {
                 try {
                     this.socket.close();
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    //e1.printStackTrace();
                 }
-                e.printStackTrace();
+               // e.printStackTrace();
                 retry = false;
             }
         }
