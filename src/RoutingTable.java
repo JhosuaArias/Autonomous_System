@@ -68,16 +68,24 @@ public class RoutingTable {
      */
     public void deleteRoutesPropagatedByAS (String asID) {
 
-        for (ArrayList<String[]> possiblePaths : this.routes.values()) {
+        for (Map.Entry<String,ArrayList<String[]>> mapEntry : this.routes.entrySet()) {
+            ArrayList<String[]> possiblePaths = mapEntry.getValue();
+            //Make a copy of the paths, so we just add the ones we want
+            ArrayList<String[]> possiblePathsCopy = (ArrayList<String[]>) possiblePaths.clone();
+            possiblePaths.clear();
 
-            for (String[] path : possiblePaths) {
+            for (String[] path : possiblePathsCopy) {
 
-                if (path.length > 0 && path[path.length-1].equals(asID)) {
-
-                    
-
+                //If the last AS in the path is not the AS we are looking for, put it back in the list
+                if (path.length > 0 && !path[path.length-1].equals(asID)) {
+                    possiblePaths.add(path);
                 }
 
+            }
+
+            //If the address has no paths, delete it.
+            if (possiblePaths.size() == 0) {
+                this.routes.remove(mapEntry.getKey());
             }
 
         }
@@ -89,27 +97,51 @@ public class RoutingTable {
      * @return
      */
     public String generateUpdateMessage (String receiverAS) {
+        String message = "";
+
+        for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
+            String[] path = entry.getValue().get(0);
+
+            if (!path[path.length - 1].equals(receiverAS)) {
+                message += entry.getKey() + ":";
 
 
-        return "";
+                for (int i = 0; i < path.length; i++) {
+                    message += path[i] + "-";
+                }
+                message = message.substring(0, message.length() - 1);
+
+
+                message += ",";
+            }
+        }
+        if (message.length() > 0) {
+            message = message.substring(0, message.length() - 1);
+        }
+
+        return message;
     }
 
     /**
      * Used to debug the table
      */
-    public void print () {
-        for (Map.Entry<String, ArrayList<String[]>> entry: this.routes.entrySet()) {
-            System.out.println(entry.getKey());
+    public String print () {
+        String result = "";
+
+        for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
+            result += entry.getKey() + ":\n";
 
             for (String[] path : entry.getValue()) {
-                System.out.print("------------ ");
+                result += "------------ ";
                 for (int i = 0; i < path.length; i++) {
-                    System.out.print(path[i] + " - ");
+                    result += path[i] + " - ";
                 }
-                System.out.println("");
+                result = result.substring(0, result.length() - 2 );
+                result += "\n";
             }
-            System.out.println("");
-
+            result += "\n";
         }
+
+        return result;
     }
 }
