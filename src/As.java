@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class As {
 
@@ -21,15 +19,6 @@ public class As {
         this.routingTable = new RoutingTable();
         this.clients = new ArrayList<>();
 
-        /*
-        this.routingTable.addRoute("192.168.1.2", new String[]{"AS2", "AS3"});
-        this.routingTable.addRoute("192.168.1.2", new String[]{"AS1", "AS2", "AS3", "AS4", "AS5"});
-        this.routingTable.addRoute("192.168.1.2", new String[]{"AS1", "AS2", "AS3", "AS7"});
-        this.routingTable.addRoute("192.168.1.2", new String[]{"AS1", "AS6", "AS5"});
-        this.routingTable.sort();
-        System.out.println(this.routingTable.print());
-
-        System.out.println(this.getUpdateMessage("AS3"));*/
     }
 
     public void start() {
@@ -54,20 +43,60 @@ public class As {
 
     }
 
-    public String showRoutes() {
-        return this.routingTable.print();
+    public void showRoutes() {
+        System.out.println(this.routingTable.print());
     }
 
-    //TODO Agregar las rutas locales a la routing table y ponerlo en el mensaje
-    public void addSubNetwork(String address) {
-        System.out.println("Add "+ address);
+    public synchronized void parseUpdateMessage(String message) {
+
+        if (message.indexOf('*') + 1 < message.length()) {
+
+            String senderAS = message.substring(0, message.indexOf('*'));
+            this.routingTable.deleteRoutesPropagatedByAS(senderAS);
+            message = message.substring(message.indexOf('*') + 1);
+
+            String[] tokenizedMessage = message.split(",");
+            for (String token : tokenizedMessage) {
+                String[] address_path_Array = token.split(":");
+                if (!this.isSubnetworkLocal(address_path_Array[0])) {
+
+                    String[] tokenizedPath = address_path_Array[1].split("-");
+                    ArrayList<String> newPath = new ArrayList<>(Arrays.asList(tokenizedPath));
+                    this.routingTable.addRoute(address_path_Array[0], newPath);
+
+                }
+            }
+
+            this.routingTable.sort();
+
+        }
+
     }
 
-    public void help() {
-        System.out.println("Help");
+    private boolean isSubnetworkLocal (String subnet) {
+        return this.knownSubnetworks.contains(subnet);
     }
 
     public synchronized String getUpdateMessage (String receivingAS) {
-        return "AS" + this.id  + "*" + this.routingTable.generateUpdateMessage(receivingAS, "AS" + this.id);
+        String message = "AS" + this.id  + "*" + this.generateLocalSubnetworksMessage()
+                + this.routingTable.generateUpdateMessage(receivingAS, "AS" + this.id);
+
+        if (message.length() > 0 && message.charAt(message.length()-1) == ',') {
+            message = message.substring(0, message.length() - 1);
+        }
+
+        return message;
+    }
+
+    private String generateLocalSubnetworksMessage() {
+        String message = "";
+
+        for (String localSubnet: this.knownSubnetworks) {
+
+            message += localSubnet + ":" + "AS" + this.id + ",";
+
+        }
+
+        return message;
     }
 }

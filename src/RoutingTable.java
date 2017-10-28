@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class RoutingTable {
 
-    private HashMap<String, ArrayList<String[]>> routes; // <IP Address, List<ASx - ASy - ASz ... >>
+    private HashMap<String, ArrayList< ArrayList<String> > > routes; // <IP Address, List<ASx - ASy - ASz ... >>
 
     /**
      *
@@ -18,8 +18,8 @@ public class RoutingTable {
      * @param newIPAddress
      * @param newPath
      */
-    public void addRoute (String newIPAddress, String[] newPath) {
-        ArrayList<String[]> possiblePaths;
+    public void addRoute (String newIPAddress, ArrayList<String> newPath) {
+        ArrayList<ArrayList<String>> possiblePaths;
 
         if (this.routes.containsKey(newIPAddress)) {
             //If the address is already registered, use the already created list
@@ -40,14 +40,14 @@ public class RoutingTable {
      */
     public void sort () {
 
-        for (ArrayList<String[]> possiblePaths : this.routes.values()) {
+        for (ArrayList<ArrayList<String>> possiblePaths : this.routes.values()) {
 
-            String[] temp;
+            ArrayList<String> temp;
             //Insertion Sort
             for (int indexOne = 1; indexOne < possiblePaths.size(); indexOne++) {
 
                 for(int indexTwo = indexOne ; indexTwo > 0 ; indexTwo--){
-                    if(possiblePaths.get(indexTwo).length < possiblePaths.get(indexTwo-1).length){
+                    if(possiblePaths.get(indexTwo).size() < possiblePaths.get(indexTwo-1).size()){
                         //Swap
                         temp = possiblePaths.get(indexTwo);
                         possiblePaths.set(indexTwo, possiblePaths.get(indexTwo-1));
@@ -68,16 +68,16 @@ public class RoutingTable {
      */
     public void deleteRoutesPropagatedByAS (String asID) {
 
-        for (Map.Entry<String,ArrayList<String[]>> mapEntry : this.routes.entrySet()) {
-            ArrayList<String[]> possiblePaths = mapEntry.getValue();
+        for (Map.Entry<String,ArrayList<ArrayList<String>>> mapEntry : this.routes.entrySet()) {
+            ArrayList<ArrayList<String>> possiblePaths = mapEntry.getValue();
             //Make a copy of the paths, so we just add the ones we want
-            ArrayList<String[]> possiblePathsCopy = (ArrayList<String[]>) possiblePaths.clone();
+            ArrayList<ArrayList<String>> possiblePathsCopy = (ArrayList<ArrayList<String>>) possiblePaths.clone();
             possiblePaths.clear();
 
-            for (String[] path : possiblePathsCopy) {
+            for (ArrayList<String> path : possiblePathsCopy) {
 
                 //If the last AS in the path is not the AS we are looking for, put it back in the list
-                if (path.length > 0 && !path[path.length-1].equals(asID)) {
+                if (path.size() > 0 && !path.get(path.size()-1).equals(asID)) {
                     possiblePaths.add(path);
                 }
 
@@ -99,26 +99,25 @@ public class RoutingTable {
     public String generateUpdateMessage (String receiverAS, String currAS) {
         String message = "";
 
-        for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
-            String[] path = entry.getValue().get(0);
+        for (Map.Entry<String, ArrayList<ArrayList<String>>> entry : this.routes.entrySet()) {
+            ArrayList<String> path = entry.getValue().get(0);
 
-            if (!path[path.length - 1].equals(receiverAS)) {
-                message += entry.getKey() + ":";
+            if (!path.get(path.size()- 1).equals(receiverAS)) {
+                message += entry.getKey() + ":" + currAS + "-";
 
 
-                for (int i = 0; i < path.length; i++) {
-                    message += path[i] + "-";
+                for (String as : path) {
+                    message += as + "-";
                 }
-                message += currAS;
+                if(message.charAt(message.length()-1) == '-') {
 
+                    message = message.substring(0, message.length() - 1);
+                }
 
                 message += ",";
             }
-        }
-        if (message.length() > 0) {
-            message = message.substring(0, message.length() - 1);
-        }
 
+        }
         return message;
     }
 
@@ -129,17 +128,17 @@ public class RoutingTable {
         String result = "";
         int counter;
 
-        for (Map.Entry<String, ArrayList<String[]>> entry : this.routes.entrySet()) {
+        for (Map.Entry<String, ArrayList<ArrayList<String>>> entry : this.routes.entrySet()) {
             result += entry.getKey() + ":\n";
             counter = 0;
 
-            for (String[] path : entry.getValue()) {
+            for (ArrayList<String> path : entry.getValue()) {
                 result += "------------ ";
-                for (int i = 0; i < path.length; i++) {
-                    result += path[i] + " - ";
+                for (String as : path) {
+                    result += as + " - ";
                 }
 
-                if (path.length > 0) {
+                if (path.size() > 0) {
                     result = result.substring(0, result.length() - 2);
                 }
                 if (counter == 0) {
