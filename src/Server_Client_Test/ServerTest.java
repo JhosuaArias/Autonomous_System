@@ -3,26 +3,22 @@ package Server_Client_Test;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerTest {
     public static void main(String[] args)  throws IOException {
         final int portNumber = 81;
         System.out.println("Creating server socket on port " + portNumber);
         ServerSocket serverSocket = new ServerSocket(portNumber);
+
+        ArrayList<ServerThread> allConnections = new ArrayList<>();
+
         while (true) {
             Socket socket = serverSocket.accept();
-            OutputStream os = socket.getOutputStream();
-            PrintWriter pw = new PrintWriter(os, true);
-            pw.println("What's you name?");
+            ServerThread serverThread = new ServerThread(serverSocket,socket);
+            allConnections.add(serverThread);
+            serverThread.start();
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String str = br.readLine();
-
-            pw.println("Hello, " + str);
-            pw.close();
-            socket.close();
-
-            System.out.println("Just said hello to:" + str);
         }
     }
 }
