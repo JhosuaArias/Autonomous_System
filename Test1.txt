@@ -1,0 +1,9 @@
+#As id
+1
+#Redes conocidas
+10.0.0.2
+
+#Vecinos BGP
+
+#Escuchar vecinos
+5555

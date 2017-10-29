@@ -4,7 +4,7 @@ public class Controller {
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
         Controller controller = new Controller(args[0]);
-        //controller.listenToTerminal();
+        controller.listenToTerminal();
     }
 
     As autonomousSystem;

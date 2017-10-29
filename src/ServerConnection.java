@@ -18,7 +18,8 @@ public class ServerConnection extends Thread {
     public void listenMessages() throws Exception{
         OutputStream os = socket.getOutputStream();
         PrintWriter pw = new PrintWriter(os, true);
-        pw.println("Receiving message");
+        //TODO cambiar esta vara
+        pw.println("AS"+ as.getId());
 
 
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -28,7 +29,8 @@ public class ServerConnection extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        pw.println("Got it: " + str);
+        as.parseUpdateMessage(str);
+        //pw.println("Got it: " + str);
         pw.close();
         socket.close();
 

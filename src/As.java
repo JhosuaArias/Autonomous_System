@@ -27,13 +27,13 @@ public class As {
 
     public void start() {
 
-        //this.listenerServer = new Server(this, this.port);
-        //this.listenerServer.start()
+        this.listenerServer = new Server(this, this.port);
+        this.listenerServer.start();
 
         for (Map.Entry<String, Integer> entry : this.bgpNeighbors.entrySet()) {
-            //Client client = new Client(this, entry.getKey(), entry.getValue());
-            //this.clients.add(client);
-            //client.start();
+            Client client = new Client(this, entry.getKey(), entry.getValue());
+            this.clients.add(client);
+            client.start();
         }
 
     }
@@ -102,5 +102,17 @@ public class As {
         }
 
         return message;
+    }
+
+    public void addSubNetwork(String address) {
+        System.out.println("Add "+ address);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

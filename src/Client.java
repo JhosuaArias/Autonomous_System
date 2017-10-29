@@ -13,7 +13,8 @@ public class Client extends Thread{
     private Socket socket;
     private String ip;
     private int port;
-    private double pastTimeMessage;
+    private String neighborAsId;
+    private boolean firstMessage;
     public Client(As as, String ip, int port) {
 
         try {
@@ -24,6 +25,7 @@ public class Client extends Thread{
         this.ip = ip;
         this.port = port;
         this.as = as;
+        this.firstMessage = true;
 
     }
 
@@ -33,16 +35,24 @@ public class Client extends Thread{
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-        System.out.println("server says:" + br.readLine());
+
 
         /*BufferedReader userInputBR = new BufferedReader(new InputStreamReader(System.in));
         String userInput = userInputBR.readLine();*/
         //TODO UNCOMMENT WHEN THE METHOD EXISTS
-        out.println(as.generateUpdateMessage());
+        if(this.firstMessage) {
+            getNeighborId(br.readLine());
+        }
 
-        System.out.println("server says:" + br.readLine());
+        out.println(as.getUpdateMessage("AS"));
+
+        //System.out.println("server says:" + br.readLine());
     }
 
+    private void getNeighborId(String message) {
+        this.neighborAsId = message;
+        this.firstMessage = false;
+    }
     public void kill() {
         this.stop();
     }
