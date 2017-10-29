@@ -1,3 +1,4 @@
+
 import Server_Client_Test.ServerThread;
 
 import java.io.IOException;
@@ -56,4 +57,5 @@ public class Server extends Thread{
         Server server = new Server(new As(1,1,null,null),81);
         server.start();
     }
+
 }
