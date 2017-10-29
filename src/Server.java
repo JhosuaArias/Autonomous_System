@@ -32,16 +32,30 @@ public class Server extends Thread{
                 allConnections.add(serverConnection);
                 serverConnection.start();
             } catch (IOException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
 
         }
     }
 
+    public void kill() {
+        for (ServerConnection connection: this.allConnections) {
+            connection.stop();
+        }
+        this.stop();
+    }
+
     @Override
     public void run(){
+        System.out.println("Server on...");
         while (true) {
             this.listenConnections();
         }
     }
+
+    public static void main(String[] args) {
+        Server server = new Server(new As(1,1,null,null),81);
+        server.start();
+    }
+
 }

@@ -42,7 +42,6 @@ public class FileParser {
                             } else {
                                 System.err.println("IP address for known subnetwork in file does not have the correct format");
                             }
-
                             break;
                         case 2: //BGP neighbors
                             Object[] ipAndPort = parseNeighbor(nextLine);

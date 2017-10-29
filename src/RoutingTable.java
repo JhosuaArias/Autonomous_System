@@ -4,7 +4,9 @@ import java.util.Map;
 
 public class RoutingTable {
 
+
     private HashMap<String, ArrayList< ArrayList<String> > > routes; // <IP Address, List<ASx - ASy - ASz ... >>
+
 
     /**
      *
@@ -82,12 +84,10 @@ public class RoutingTable {
                 }
 
             }
-
             //If the address has no paths, delete it.
             if (possiblePaths.size() == 0) {
                 this.routes.remove(mapEntry.getKey());
             }
-
         }
     }
 
