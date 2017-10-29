@@ -1,3 +1,4 @@
+
 import Server_Client_Test.ServerThread;
 
 import java.io.IOException;
@@ -43,6 +44,4 @@ public class Server extends Thread{
             this.listenConnections();
         }
     }
-
-
 }
