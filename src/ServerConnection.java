@@ -18,19 +18,13 @@ public class ServerConnection extends Thread {
     public void listenMessages() throws Exception{
         OutputStream os = socket.getOutputStream();
         PrintWriter pw = new PrintWriter(os, true);
-        //TODO cambiar esta vara
-        pw.println("AS"+ as.getId());
-
 
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String str = br.readLine();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        as.parseUpdateMessage(str);
-        //pw.println("Got it: " + str);
+
+        this.as.parseUpdateMessage(str);
+        pw.println(this.as.getUpdateMessage("AS2"));
+
         pw.close();
         socket.close();
 

@@ -3,17 +3,21 @@ public class Controller {
 
     // ALT+SHIFT+F10, Right, E, Enter, Tab  : para poner comandos en el main en IntelliJ
     public static void main(String[] args) {
-        Controller controller = new Controller(args[0]);
-        controller.listenToTerminal();
+        if (args.length > 0) {
+            Controller controller = new Controller(args[0]);
+            controller.listenToTerminal();
+        } else {
+            System.err.println("Please, enter the file name!");
+        }
     }
 
-    As autonomousSystem;
+    private As autonomousSystem;
     private final String ADDRESS_FORMAT = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
 
-    Controller(String fileName) {
+    public Controller(String fileName) {
         FileParser parser = new FileParser();
         try {
-           autonomousSystem = parser.createAS(fileName);
+           this.autonomousSystem = parser.createAS(fileName);
         } catch (Exception e) {
             System.err.println("Error parsing the file " + fileName);
         }
@@ -21,29 +25,43 @@ public class Controller {
 
     private void listenToTerminal() {
         Terminal terminal = new Terminal();
+        terminal.helloMessage(this.autonomousSystem.getId());
         String command;
         while(!(command = terminal.receiveCommand()).equals("stop")) {
             command = command.trim().replaceAll(" +", " ");  // removes unwanted whitespace
-            parseCommand(command);
+            this.parseCommand(command);
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
+
         // the "stop" command was used
-        this.autonomousSystem.stop();
+        this.stopCommand();
     }
 
     private void parseCommand(String command) {
         if (command.equals("help")) {
             this.helpCommand();
+
         } else if (command.equals("start")) {
             this.startCommand();
+
         } else if(command.startsWith("add ") && command.split(" ").length == 2) { //whitespace at the end to ensure that a parameter is present (string is trimmed)
             String ipAddress = command.split(" ")[1];
             if (ipAddress.matches(ADDRESS_FORMAT)) {
                 this.addSubnetCommand(ipAddress);  //sends only the address as parameter
+
             } else {
                 System.out.println("Invalid input ip address: " + ipAddress);
             }
+
         } else if (command.equals("show routes")) {
             this.showRoutesCommand();
+
         } else {
             System.out.println("Unsupported command or wrong quantity of parameters, use the \"help\" command if needed");
         }

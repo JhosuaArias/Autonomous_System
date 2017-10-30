@@ -15,13 +15,9 @@ public class Client extends Thread{
     private int port;
     private String neighborAsId;
     private boolean firstMessage;
+
     public Client(As as, String ip, int port) {
 
-        try {
-            socket = new Socket(ip,port);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         this.ip = ip;
         this.port = port;
         this.as = as;
@@ -54,7 +50,13 @@ public class Client extends Thread{
         this.firstMessage = false;
     }
     public void kill() {
-        this.stop();
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0);
     }
 
     @Override
@@ -71,10 +73,4 @@ public class Client extends Thread{
         }
     }
 
-
-
-    public static void main(String[] args) {
-        Client client = new Client(new As(1,1,null,null),"localhost",81);
-        client.start();
-    }
 }

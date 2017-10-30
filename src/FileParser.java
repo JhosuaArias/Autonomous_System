@@ -7,7 +7,7 @@ public class FileParser {
     private final String ADDRESS_FORMAT = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
 
     public As createAS(String fileName) throws Exception {
-        As createdAs = null;
+        As createdAs;
 
         int asId = 0;
         int asPort = 0;
@@ -34,6 +34,7 @@ public class FileParser {
                                 asId = Integer.parseInt(nextLine);
                             } catch (NumberFormatException nfe) {
                                 System.err.println("Supplied ID in file is not numeric");
+                                throw new RuntimeException("");
                             }
                             break;
                         case 1: //known networks
@@ -41,24 +42,27 @@ public class FileParser {
                                 knownSubnetworks.add(nextLine);
                             } else {
                                 System.err.println("IP address for known subnetwork in file does not have the correct format");
+                                throw new RuntimeException("");
                             }
                             break;
                         case 2: //BGP neighbors
                             Object[] ipAndPort = parseNeighbor(nextLine);
                             bgpNeighbors.put( (String) ipAndPort[0], (int) ipAndPort[1]);
-                            System.out.println(bgpNeighbors.size());
                             break;
-                        case 3: //listen neigbors
+                        case 3: //listen neighbors
                             try {
                                 asPort = Integer.parseInt(nextLine);
                             } catch (NumberFormatException nfe) {
                                 System.err.println("Supplied port for AS in file is not numeric");
+                                throw new RuntimeException("");
                             }
                             break;
                     }
                 }
             }
         }
+
+        // TODO Hacer que se caiga si los valores están vacíos
 
         createdAs = new As(asId, asPort, knownSubnetworks, bgpNeighbors);
 
@@ -67,7 +71,7 @@ public class FileParser {
         return createdAs;
     }
 
-    Object[] parseNeighbor(String bgpNeighbor) {
+    private Object[] parseNeighbor(String bgpNeighbor) {
         String ip = bgpNeighbor.split(":")[0];
         String port = bgpNeighbor.split(":")[1];
         Object[] ipAndPort = new Object[2];

@@ -40,14 +40,22 @@ public class As {
 
     public void stop() {
 
-        //this.listenerServer.forceStop();
+        if (this.listenerServer != null) {
+            this.listenerServer.kill();
+        }
+
         for (Client client : this.clients) {
-            //client.stop();
+            client.kill();
         }
 
     }
 
     public void showRoutes() {
+        System.out.println("Local Subnetworks:");
+        for (String localSubnet: this.knownSubnetworks) {
+            System.out.println("* " + localSubnet);
+        }
+        System.out.println("Known routes:");
         System.out.println(this.routingTable.print());
     }
 
@@ -96,23 +104,18 @@ public class As {
         String message = "";
 
         for (String localSubnet: this.knownSubnetworks) {
-
             message += localSubnet + ":" + "AS" + this.id + ",";
-
         }
 
         return message;
     }
 
-    public void addSubNetwork(String address) {
-        System.out.println("Add "+ address);
+    public synchronized void addSubNetwork(String address) {
+        this.knownSubnetworks.add(address);
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 }

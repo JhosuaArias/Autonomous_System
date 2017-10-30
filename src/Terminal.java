@@ -13,10 +13,15 @@ public class Terminal {
     String receiveCommand() {
         String userInput = "";
         try {
+            System.out.print(">> ");
             userInput = stdIn.readLine();
         } catch (IOException e) {
             System.out.println("IOException, could not read from std in");
         }
         return userInput;
+    }
+
+    public void helloMessage(int asId) {
+        System.out.println("Welcome to the AS #" + asId +" terminal!");
     }
 }

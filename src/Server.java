@@ -27,9 +27,9 @@ public class Server extends Thread{
     private void listenConnections() {
         while (true) {
             try {
-                Socket socket = serverSocket.accept();
+                Socket socket = this.serverSocket.accept();
                 ServerConnection serverConnection = new ServerConnection(this.as ,this.serverSocket ,socket);
-                allConnections.add(serverConnection);
+                this.allConnections.add(serverConnection);
                 serverConnection.start();
             } catch (IOException e) {
                // e.printStackTrace();
@@ -42,7 +42,15 @@ public class Server extends Thread{
         for (ServerConnection connection: this.allConnections) {
             connection.stop();
         }
-        this.stop();
+
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0);
+
     }
 
     @Override
@@ -51,11 +59,6 @@ public class Server extends Thread{
         while (true) {
             this.listenConnections();
         }
-    }
-
-    public static void main(String[] args) {
-        Server server = new Server(new As(1,1,null,null),81);
-        server.start();
     }
 
 }
