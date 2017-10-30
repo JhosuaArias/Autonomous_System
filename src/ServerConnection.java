@@ -23,14 +23,12 @@ public class ServerConnection extends Thread {
         String str = br.readLine();
 
         this.as.parseUpdateMessage(str);
-        pw.println(this.as.getUpdateMessage("AS2"));
+        pw.println(this.as.getUpdateMessage("AS1"));
 
         pw.close();
         socket.close();
 
         System.out.println("Just receive :" + str);
-
-        this.socket = serverSocket.accept();
     }
 
     @Override

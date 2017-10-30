@@ -1,12 +1,10 @@
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.ExecutionException;
 
 public class Client extends Thread{
     private As as;
@@ -14,14 +12,11 @@ public class Client extends Thread{
     private String ip;
     private int port;
     private String neighborAsId;
-    private boolean firstMessage;
-
     public Client(As as, String ip, int port) {
 
         this.ip = ip;
         this.port = port;
         this.as = as;
-        this.firstMessage = true;
 
     }
 
@@ -31,24 +26,11 @@ public class Client extends Thread{
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-
-
-        /*BufferedReader userInputBR = new BufferedReader(new InputStreamReader(System.in));
-        String userInput = userInputBR.readLine();*/
-        //TODO UNCOMMENT WHEN THE METHOD EXISTS
-        if(this.firstMessage) {
-            getNeighborId(br.readLine());
-        }
-
-        out.println(as.getUpdateMessage("AS"));
+        out.println(as.getUpdateMessage("AS2"));
 
         //System.out.println("server says:" + br.readLine());
     }
 
-    private void getNeighborId(String message) {
-        this.neighborAsId = message;
-        this.firstMessage = false;
-    }
     public void kill() {
         try {
             this.socket.close();
@@ -65,8 +47,9 @@ public class Client extends Thread{
         while (true){
 
             try {
+                System.err.println("Trying to send message");
                 this.sendMessage();
-                Thread.sleep(3000);
+                Thread.sleep(30000);
             } catch (InterruptedException|IOException e) {
                 retry = false;
             }
