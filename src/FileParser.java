@@ -13,6 +13,7 @@ public class FileParser {
         int asPort = 0;
         ArrayList<String> knownSubnetworks = new ArrayList<>();
         HashMap<String, Integer> bgpNeighbors = new HashMap<>();
+        int filledValues = 0; // Controls that no mandatory field is left blank
 
         File file = new File(fileName);
 
@@ -30,10 +31,19 @@ public class FileParser {
                 } else {
                     switch (index) {
                         case 0: //id
-                            asId = Integer.parseInt(nextLine);
+                            try {
+                                asId = Integer.parseInt(nextLine);
+                                filledValues++;
+                            } catch (NumberFormatException nfe) {
+                                System.err.println("Supplied ID in file is not numeric");
+                            }
                             break;
                         case 1: //known networks
-                            knownSubnetworks.add(nextLine);
+                            if (nextLine.matches(ADDRESS_FORMAT)) {
+                                knownSubnetworks.add(nextLine);
+                            } else {
+                                System.err.println("IP address for known subnetwork in file does not have the correct format");
+                            }
                             break;
                         case 2: //BGP neighbors
                             Object[] ipAndPort = parseNeighbor(nextLine);
@@ -41,14 +51,25 @@ public class FileParser {
                             System.out.println(bgpNeighbors.size());
                             break;
                         case 3: //listen neigbors
-                            asPort = Integer.parseInt(nextLine);
+                            try {
+                                asPort = Integer.parseInt(nextLine);
+                                filledValues++;
+                            } catch (NumberFormatException nfe) {
+                                System.err.println("Supplied port for AS in file is not numeric");
+                            }
                             break;
                     }
                 }
             }
         }
 
-        createdAs = new As(asId, asPort, knownSubnetworks, bgpNeighbors);
+        if (filledValues >= 2) {
+            createdAs = new As(asId, asPort, knownSubnetworks, bgpNeighbors);
+        } else {
+            System.err.println("A mandatory field was left empty in the file");
+            throw new Exception();
+        }
+
 
         input.close();
 
