@@ -61,7 +61,7 @@ public class As {
 
     public synchronized void parseUpdateMessage(String message) {
 
-        if (message.indexOf('*') + 1 < message.length()) {
+        if (message != null && message.indexOf('*') + 1 < message.length()) {
 
             String senderAS = message.substring(0, message.indexOf('*'));
             this.routingTable.deleteRoutesPropagatedByAS(senderAS);

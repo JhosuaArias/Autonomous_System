@@ -27,6 +27,7 @@ public class Server extends Thread{
     private void listenConnections() {
         while (true) {
             try {
+                System.out.println("Accepting connections");
                 Socket socket = this.serverSocket.accept();
                 ServerConnection serverConnection = new ServerConnection(this.as ,this.serverSocket ,socket);
                 this.allConnections.add(serverConnection);

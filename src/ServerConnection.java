@@ -29,12 +29,12 @@ public class ServerConnection extends Thread {
         socket.close();
 
         System.out.println("Just receive :" + str);
+        serverSocket.accept();
     }
 
     @Override
     public  void run() {
-        boolean retry = true;
-        while(retry) {
+        while(true) {
             try {
                 this.listenMessages();
             } catch (Exception e) {
@@ -43,10 +43,9 @@ public class ServerConnection extends Thread {
                 } catch (IOException e1) {
                     //e1.printStackTrace();
                 }
-               // e.printStackTrace();
-                retry = false;
             }
         }
+
     }
 
 }

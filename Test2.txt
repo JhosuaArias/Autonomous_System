@@ -4,6 +4,6 @@
 11.3.2.3
 
 #Vecinos BGP
-
+1.1.1.1:1
 #Escuchar vecinos
 6767

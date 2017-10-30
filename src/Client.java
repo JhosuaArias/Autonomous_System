@@ -23,12 +23,15 @@ public class Client extends Thread{
 
     public  void sendMessage() throws IOException{
         this.socket = new Socket(this.ip, this.port);
+
         BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
         out.println(as.getUpdateMessage("AS2"));
 
-        //System.out.println("server says:" + br.readLine());
+        String str = br.readLine();
+        this.as.parseUpdateMessage(str);
+        System.out.println("Just receive :" + str);
     }
 
     public void kill() {
@@ -49,7 +52,7 @@ public class Client extends Thread{
             try {
                 System.err.println("Trying to send message");
                 this.sendMessage();
-                Thread.sleep(30000);
+                Thread.sleep(10000);
             } catch (InterruptedException|IOException e) {
                 retry = false;
             }
