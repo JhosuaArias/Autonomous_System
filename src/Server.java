@@ -9,16 +9,13 @@ import java.util.ArrayList;
 public class Server extends Thread{
 
     private As as;
-    private int port;
-    private ArrayList<ServerConnection> allConnections;
-    ServerSocket serverSocket;
+    private ServerSocket serverSocket;
+
     public Server(As as, int port) {
         this.as = as;
-        this.port = port;
-        this.allConnections = new ArrayList<>();
 
         try {
-            this.serverSocket = new ServerSocket(this.port);
+            this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -28,9 +25,9 @@ public class Server extends Thread{
         while (true) {
             try {
                 System.out.println("Accepting connections");
-                Socket socket = this.serverSocket.accept();
-                ServerConnection serverConnection = new ServerConnection(this.as ,this.serverSocket ,socket);
-                this.allConnections.add(serverConnection);
+                Socket clientSocket = this.serverSocket.accept();
+
+                ServerConnection serverConnection = new ServerConnection(this.as, clientSocket);
                 serverConnection.start();
             } catch (IOException e) {
                // e.printStackTrace();
@@ -40,9 +37,6 @@ public class Server extends Thread{
     }
 
     public void kill() {
-        for (ServerConnection connection: this.allConnections) {
-            connection.stop();
-        }
 
         try {
             this.serverSocket.close();

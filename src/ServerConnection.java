@@ -1,49 +1,42 @@
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerConnection extends Thread {
 
     private As as;
-    private ServerSocket serverSocket;
-    private Socket socket;
+    private Socket clientSocket;
 
-    public ServerConnection(As as, ServerSocket serverSocket, Socket socket) {
+    public ServerConnection(As as, Socket clientSocket) {
         this.as = as;
-        this.serverSocket = serverSocket;
-        this.socket = socket;
+        this.clientSocket = clientSocket;
     }
 
 
-    public void listenMessages() throws Exception{
-        OutputStream os = socket.getOutputStream();
-        PrintWriter pw = new PrintWriter(os, true);
+    public void listenMessages() throws Exception {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        String str = br.readLine();
+        BufferedReader in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+        PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
 
-        this.as.parseUpdateMessage(str);
-        pw.println(this.as.getUpdateMessage("AS1"));
+        String updateMessage = null;
+        while (updateMessage == null) {
+            updateMessage = in.readLine();
+        }
+        out.println(this.as.getUpdateMessage(updateMessage.substring(0, updateMessage.indexOf('*'))));
 
-        pw.close();
-        socket.close();
+        this.clientSocket.close();
 
-        System.out.println("Just receive :" + str);
-        serverSocket.accept();
+        System.out.println("Just receive :" + updateMessage);
+        this.as.parseUpdateMessage(updateMessage);
     }
 
     @Override
-    public  void run() {
-        while(true) {
-            try {
-                this.listenMessages();
-            } catch (Exception e) {
-                try {
-                    this.socket.close();
-                } catch (IOException e1) {
-                    //e1.printStackTrace();
-                }
-            }
+    public void run() {
+        try {
+            this.listenMessages();
+            System.err.println("Salí mama");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Shit");
         }
 
     }

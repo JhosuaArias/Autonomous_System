@@ -4,15 +4,15 @@ import java.util.*;
 
 public class As {
 
-    private int id;
-    private int port;
-    private ArrayList<String> knownSubnetworks;
-    private HashMap<String, Integer> bgpNeighbors;
-    private RoutingTable routingTable;
+    private volatile int id;
+    private volatile int port;
+    private volatile ArrayList<String> knownSubnetworks;
+    private volatile HashMap<String, Integer> bgpNeighbors;
+    private volatile RoutingTable routingTable;
 
 
-    private Server listenerServer;
-    private ArrayList<Client> clients;
+    private volatile Server listenerServer;
+    private volatile ArrayList<Client> clients;
 
     public As(int id, int port, ArrayList<String> knownSubnetworks, HashMap<String, Integer> bgpNeighbors) {
         this.id = id;

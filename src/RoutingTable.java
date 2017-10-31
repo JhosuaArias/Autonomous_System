@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class RoutingTable {
 
 
-    private HashMap<String, ArrayList< ArrayList<String> > > routes; // <IP Address, List<ASx - ASy - ASz ... >>
+    private volatile HashMap<String, ArrayList< ArrayList<String> > > routes; // <IP Address, List<ASx - ASy - ASz ... >>
 
 
     /**
@@ -70,7 +71,10 @@ public class RoutingTable {
      */
     public void deleteRoutesPropagatedByAS (String asID) {
 
-        for (Map.Entry<String,ArrayList<ArrayList<String>>> mapEntry : this.routes.entrySet()) {
+        for (Iterator< Map.Entry<String,ArrayList<ArrayList<String>>> > iterator = this.routes.entrySet().iterator(); iterator.hasNext(); ) {
+
+            Map.Entry<String,ArrayList<ArrayList<String>>> mapEntry = iterator.next();
+
             ArrayList<ArrayList<String>> possiblePaths = mapEntry.getValue();
             //Make a copy of the paths, so we just add the ones we want
             ArrayList<ArrayList<String>> possiblePathsCopy = (ArrayList<ArrayList<String>>) possiblePaths.clone();
@@ -84,9 +88,10 @@ public class RoutingTable {
                 }
 
             }
+
             //If the address has no paths, delete it.
             if (possiblePaths.size() == 0) {
-                this.routes.remove(mapEntry.getKey());
+                iterator.remove();
             }
         }
     }

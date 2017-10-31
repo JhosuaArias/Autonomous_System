@@ -1,42 +1,48 @@
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class Client extends Thread{
     private As as;
-    private Socket socket;
+    private Socket clientSocket;
     private String ip;
     private int port;
     private String neighborAsId;
+
     public Client(As as, String ip, int port) {
 
         this.ip = ip;
         this.port = port;
         this.as = as;
+        this.neighborAsId = "";
 
     }
 
 
     public  void sendMessage() throws IOException{
-        this.socket = new Socket(this.ip, this.port);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        this.clientSocket = new Socket(this.ip, this.port);
 
-        out.println(as.getUpdateMessage("AS2"));
+        BufferedReader in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+        PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
 
-        String str = br.readLine();
-        this.as.parseUpdateMessage(str);
-        System.out.println("Just receive :" + str);
+        out.println(this.as.getUpdateMessage(this.neighborAsId));
+        String updateMessage = null;
+        while (updateMessage == null) {
+            updateMessage = in.readLine();
+        }
+        this.neighborAsId = updateMessage.substring(0, updateMessage.indexOf('*'));
+
+        this.clientSocket.close();
+
+        System.out.println("Just receive :" + updateMessage);
+        this.as.parseUpdateMessage(updateMessage);
     }
 
     public void kill() {
         try {
-            this.socket.close();
+            this.clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,9 +58,14 @@ public class Client extends Thread{
             try {
                 System.err.println("Trying to send message");
                 this.sendMessage();
-                Thread.sleep(10000);
-            } catch (InterruptedException|IOException e) {
-                retry = false;
+            } catch (IOException e) {
+
+            }
+
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+
             }
         }
     }
