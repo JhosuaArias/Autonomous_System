@@ -110,6 +110,10 @@ public class As {
         return message;
     }
 
+    public void deleteAllRoutesWithAS (String as) {
+        this.routingTable.deleteAllRoutesWithAS(as);
+    }
+
     public synchronized void addSubNetwork(String address) {
         this.knownSubnetworks.add(address);
     }

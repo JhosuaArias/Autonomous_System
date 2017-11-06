@@ -29,25 +29,47 @@ public class Client extends Thread{
 
         out.println(this.as.getUpdateMessage(this.neighborAsId));
         String updateMessage = null;
-        while (updateMessage == null) {
+
+        long initialTime = System.currentTimeMillis();
+        long currentTime = initialTime;
+
+        while (currentTime - initialTime <= 30000 && updateMessage == null) {
             updateMessage = in.readLine();
+            currentTime = System.currentTimeMillis();
+            System.err.println(currentTime-initialTime);
         }
-        this.neighborAsId = updateMessage.substring(0, updateMessage.indexOf('*'));
+
+        if (currentTime - initialTime > 30000) {
+            this.finishConnection();
+        }
+
+        if (this.neighborAsId.equals("")) {
+            this.neighborAsId = updateMessage.substring(0, updateMessage.indexOf('*'));
+        }
 
         this.clientSocket.close();
-
-        System.out.println("Just receive :" + updateMessage);
+        this.clientSocket = null;
         this.as.parseUpdateMessage(updateMessage);
     }
 
     public void kill() {
-        try {
-            this.clientSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (this.clientSocket != null) {
+            try {
+                this.clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        System.exit(0);
+        System.err.println("Client stopped listening");
+        this.stop();
+    }
+
+    private void finishConnection () {
+
+        this.as.deleteAllRoutesWithAS(this.neighborAsId);
+        this.kill();
+
     }
 
     @Override
@@ -56,10 +78,11 @@ public class Client extends Thread{
         while (true){
 
             try {
-                System.err.println("Trying to send message");
                 this.sendMessage();
             } catch (IOException e) {
-
+                if(!this.neighborAsId.equals("")) {
+                    this.finishConnection();
+                }
             }
 
             try {

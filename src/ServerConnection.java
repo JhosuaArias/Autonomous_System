@@ -25,7 +25,6 @@ public class ServerConnection extends Thread {
 
         this.clientSocket.close();
 
-        System.out.println("Just receive :" + updateMessage);
         this.as.parseUpdateMessage(updateMessage);
     }
 
@@ -33,10 +32,8 @@ public class ServerConnection extends Thread {
     public void run() {
         try {
             this.listenMessages();
-            System.err.println("Salí mama");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Shit");
         }
 
     }

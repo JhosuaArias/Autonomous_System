@@ -22,9 +22,9 @@ public class Server extends Thread{
     }
 
     private void listenConnections() {
+        System.err.println("Server is listening");
         while (true) {
             try {
-                System.out.println("Accepting connections");
                 Socket clientSocket = this.serverSocket.accept();
 
                 ServerConnection serverConnection = new ServerConnection(this.as, clientSocket);
@@ -34,6 +34,7 @@ public class Server extends Thread{
             }
 
         }
+
     }
 
     public void kill() {
@@ -44,13 +45,14 @@ public class Server extends Thread{
             e.printStackTrace();
         }
 
-        System.exit(0);
+        System.err.println("Server stopped listening");
+        this.stop();
 
     }
 
     @Override
     public void run(){
-        System.out.println("Server on...");
+
         while (true) {
             this.listenConnections();
         }
