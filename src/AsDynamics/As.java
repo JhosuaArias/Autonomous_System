@@ -1,3 +1,6 @@
+package AsDynamics;
+
+import IO.Terminal;
 
 import java.util.*;
 
@@ -13,6 +16,7 @@ public class As {
 
     private volatile Server listenerServer;
     private volatile ArrayList<Client> clients;
+    private volatile Terminal terminal;
 
     public As(int id, int port, ArrayList<String> knownSubnetworks, HashMap<String, Integer> bgpNeighbors) {
         this.id = id;
@@ -42,10 +46,12 @@ public class As {
 
         if (this.listenerServer != null) {
             this.listenerServer.kill();
+            System.err.println("Listener server: OFF");
         }
 
         for (Client client : this.clients) {
             client.kill();
+            System.err.println("Client: OFF");
         }
 
     }
@@ -59,7 +65,7 @@ public class As {
         System.out.println(this.routingTable.print());
     }
 
-    public synchronized void parseUpdateMessage(String message) {
+    synchronized void parseUpdateMessage(String message) {
 
         if (message != null && message.indexOf('*') + 1 < message.length()) {
 
@@ -89,7 +95,7 @@ public class As {
         return this.knownSubnetworks.contains(subnet);
     }
 
-    public synchronized String getUpdateMessage (String receivingAS) {
+    synchronized String getUpdateMessage (String receivingAS) {
         String message = "AS" + this.id  + "*" + this.generateLocalSubnetworksMessage()
                 + this.routingTable.generateUpdateMessage(receivingAS, "AS" + this.id);
 
@@ -110,7 +116,7 @@ public class As {
         return message;
     }
 
-    public void deleteAllRoutesWithAS (String as) {
+    void deleteAllRoutesWithAS (String as) {
         this.routingTable.deleteAllRoutesWithAS(as);
     }
 
@@ -118,8 +124,16 @@ public class As {
         this.knownSubnetworks.add(address);
     }
 
+    public synchronized void depositMessage (String message) {
+        this.terminal.addNewMessage(message);
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setTerminal (Terminal terminal) {
+        this.terminal = terminal;
     }
 
 }

@@ -1,9 +1,11 @@
+package AsDynamics;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class RoutingTable {
+class RoutingTable {
 
 
     private volatile HashMap<String, ArrayList< ArrayList<String> > > routes; // <IP Address, List<ASx - ASy - ASz ... >>
@@ -12,16 +14,16 @@ public class RoutingTable {
     /**
      *
      */
-    public RoutingTable () {
+    RoutingTable () {
         this.routes = new HashMap<>();
     }
 
     /**
-     *
-     * @param newIPAddress
-     * @param newPath
+     * Adds a new route for the ip address, if the address isn't registered, it adds the address to the table
+     * @param newIPAddress the ip address for the new path
+     * @param newPath the new path of the address
      */
-    public void addRoute (String newIPAddress, ArrayList<String> newPath) {
+    void addRoute (String newIPAddress, ArrayList<String> newPath) {
         ArrayList<ArrayList<String>> possiblePaths;
 
         if (this.routes.containsKey(newIPAddress)) {
@@ -41,7 +43,7 @@ public class RoutingTable {
     /**
      * Sorts all the possible paths and puts the shortest one first.
      */
-    public void sort () {
+    void sort () {
 
         for (ArrayList<ArrayList<String>> possiblePaths : this.routes.values()) {
 
@@ -66,10 +68,10 @@ public class RoutingTable {
     }
 
     /**
-     *
-     * @param asID
+     * Deletes all the routes propagated by the indicated AS
+     * @param asID The id of the AS
      */
-    public void deleteRoutesPropagatedByAS (String asID) {
+    void deleteRoutesPropagatedByAS (String asID) {
 
         for (Iterator< Map.Entry<String,ArrayList<ArrayList<String>>> > iterator = this.routes.entrySet().iterator(); iterator.hasNext(); ) {
 
@@ -97,17 +99,17 @@ public class RoutingTable {
     }
 
     /**
-     *
-     * @param receiverAS
-     * @return
+     * Generates the update message, excluding the routes propagated by the indicated AS
+     * @param receiverAS THe id of the indicated AS
+     * @return The update message
      */
-    public String generateUpdateMessage (String receiverAS, String currAS) {
+    String generateUpdateMessage (String receiverAS, String currAS) {
         String message = "";
 
         for (Map.Entry<String, ArrayList<ArrayList<String>>> entry : this.routes.entrySet()) {
             ArrayList<String> path = entry.getValue().get(0);
 
-            if (!path.get(path.size()- 1).equals(receiverAS)) {
+            if (!path.get(0).equals(receiverAS)) {
                 message += entry.getKey() + ":" + currAS + "-";
 
 
@@ -127,9 +129,9 @@ public class RoutingTable {
     }
 
     /**
-     * Used to debug the table
+     * Prints all the table
      */
-    public String print () {
+    String print () {
         String result = "";
         int counter;
 
@@ -159,7 +161,11 @@ public class RoutingTable {
         return result;
     }
 
-    public void deleteAllRoutesWithAS (String asID) {
+    /**
+     * Deletes all the routes that contain the indicated AS
+     * @param asID The id of the indicated AS
+     */
+    void deleteAllRoutesWithAS (String asID) {
         for (Iterator< Map.Entry<String,ArrayList<ArrayList<String>>> > iterator = this.routes.entrySet().iterator(); iterator.hasNext(); ) {
 
             Map.Entry<String,ArrayList<ArrayList<String>>> mapEntry = iterator.next();

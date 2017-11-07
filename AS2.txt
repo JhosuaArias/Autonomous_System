@@ -1,9 +1,13 @@
 #As id
 2
+
 #Redes conocidas
-11.3.2.3
+1.2.3.4
+217.12.5.3
+20.3.1.2
 
 #Vecinos BGP
+127.0.0.1:8888
 
 #Escuchar vecinos
 6767
