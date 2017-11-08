@@ -7,9 +7,11 @@ import IO.Terminal;
 public class Controller {
 
     private As autonomousSystem;
+    private boolean started;
 
     public Controller(String fileName) {
         FileParser parser = new FileParser();
+        started = false;
         try {
            this.autonomousSystem = parser.createAS(fileName);
         } catch (Exception e) {
@@ -72,11 +74,17 @@ public class Controller {
     }
 
     private void startCommand() {
-        this.autonomousSystem.start();
+        if (!this.started) {
+            this.started = true;
+            this.autonomousSystem.start();
+        } else {
+            System.err.println("The AS is already started");
+        }
+
     }
 
     private void helpCommand() {
-        System.out.println("The supported commands are: \n -help \n -start \n -stop \n -show routes \n -add <<subnet address>>");
+        System.out.println("The supported commands are: \n -help \n -start \n -stop \n -show routes \n -add <<subnet address>> \n -show msg \n -msg?");
     }
 
     private void showRoutesCommand() {
