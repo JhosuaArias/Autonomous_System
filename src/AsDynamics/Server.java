@@ -25,6 +25,7 @@ public class Server extends Thread{
 
     private void listenConnections() {
         this.as.depositMessage("Listener server: ON");
+        this.as.getLogWriter().writeIntoLog("Listener server: ON");
 
         while (this.retry) {
             try {
@@ -35,6 +36,7 @@ public class Server extends Thread{
                 serverConnection.start();
             } catch (IOException e) {
                // e.printStackTrace();
+                this.as.getLogWriter().writeIntoLog("Error the server cannot establish a connection");
             }
 
         }
@@ -46,6 +48,7 @@ public class Server extends Thread{
         for (ServerConnection connection : this.serverConnections) {
             connection.kill();
             System.err.println("Server connection: OFF");
+            this.as.getLogWriter().writeIntoLog("Server connection: OFF");
         }
 
         this.retry = false;
@@ -56,6 +59,7 @@ public class Server extends Thread{
                 closed = true;
             } catch (IOException e) {
                 System.err.println("Couldn't close the server socket, retrying...");
+                this.as.getLogWriter().writeIntoLog("Couldn't close the server socket, retrying...");
             }
         }
 

@@ -2,7 +2,9 @@ package Controller;
 
 import AsDynamics.As;
 import IO.FileParser;
+import IO.LogWriter;
 import IO.Terminal;
+import java.io.FileNotFoundException;
 
 public class Controller {
 
@@ -16,6 +18,13 @@ public class Controller {
            this.autonomousSystem = parser.createAS(fileName);
         } catch (Exception e) {
             System.err.println("Error parsing the file " + fileName);
+        }
+
+        try {
+            LogWriter logWriter = new LogWriter(this.autonomousSystem.getId());
+            this.autonomousSystem.setLogWriter(logWriter);
+        } catch (FileNotFoundException e) {
+            System.out.println("Something went wrong and the Log could not be created");
         }
     }
 

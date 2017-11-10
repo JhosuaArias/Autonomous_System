@@ -1,7 +1,9 @@
 package AsDynamics;
 
+import IO.LogWriter;
 import IO.Terminal;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 
@@ -17,6 +19,7 @@ public class As {
     private volatile Server listenerServer;
     private volatile ArrayList<Client> clients;
     private volatile Terminal terminal;
+    private volatile LogWriter logWriter;
 
     public As(int id, int port, ArrayList<String> knownSubnetworks, HashMap<String, Integer> bgpNeighbors) {
         this.id = id;
@@ -54,6 +57,7 @@ public class As {
             System.err.println("Client: OFF");
         }
 
+        logWriter.close();
     }
 
     public void showRoutes() {
@@ -136,4 +140,11 @@ public class As {
         this.terminal = terminal;
     }
 
+    public LogWriter getLogWriter() {
+        return logWriter;
+    }
+
+    public void setLogWriter(LogWriter logWriter) {
+        this.logWriter = logWriter;
+    }
 }
