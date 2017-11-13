@@ -85,7 +85,7 @@ public class ServerConnection extends Thread {
     private void finishConnection () {
 
         this.as.depositMessage("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
+        this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
         this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.kill();
 

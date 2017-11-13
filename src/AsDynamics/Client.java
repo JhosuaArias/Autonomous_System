@@ -94,7 +94,7 @@ public class Client extends Thread {
 
     private void finishConnection () {
         this.as.depositMessage("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
+        this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
         this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.kill();
 
@@ -110,7 +110,7 @@ public class Client extends Thread {
                 this.sendMessage();
             } catch (IOException e) {
                 if(!this.neighborAsId.equals("")) {
-                    this.finishConnection();
+                    this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
                 }
             }
 

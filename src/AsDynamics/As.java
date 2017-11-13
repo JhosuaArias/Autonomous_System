@@ -116,8 +116,8 @@ public class As {
         return message;
     }
 
-    void deleteAllRoutesWithAS (String as) {
-        this.routingTable.deleteAllRoutesWithAS(as);
+    void deleteAllRoutesPropagatedByAS (String as) {
+        this.routingTable.deleteRoutesPropagatedByAS(as);
     }
 
     public synchronized void addSubNetwork(String address) {
