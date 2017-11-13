@@ -47,11 +47,13 @@ public class ServerConnection extends Thread {
             if (this.neighborAsId.equals("")) {
                 this.neighborAsId = updateMessage.substring(0, updateMessage.indexOf('*'));
                 this.as.depositMessage("Server successfully connected with " + this.neighborAsId + ".");
+                this.as.getLogWriter().writeIntoLog("Server successfully connected with " + this.neighborAsId + ".");
             }
 
             out.println(this.as.getUpdateMessage(updateMessage.substring(0, updateMessage.indexOf('*'))));
 
             this.as.depositMessage("New update message from " + this.neighborAsId);
+            this.as.getLogWriter().writeIntoLog("New update message from " + this.neighborAsId);
             this.as.parseUpdateMessage(updateMessage);
         }
     }
@@ -85,8 +87,10 @@ public class ServerConnection extends Thread {
     private void finishConnection () {
 
         this.as.depositMessage("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
-        this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
+        this.as.getLogWriter().writeIntoLog("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
+        this.as.deleteAllRoutesWithAS(this.neighborAsId);
         this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
+        this.as.getLogWriter().writeIntoLog("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.kill();
 
     }
@@ -96,6 +100,7 @@ public class ServerConnection extends Thread {
         this.retry = true;
 
         this.as.depositMessage("Server with AS?? started.");
+        this.as.getLogWriter().writeIntoLog("Server with AS?? started.");
         while (this.retry) {
             try {
                 this.listenMessages();

@@ -1,7 +1,6 @@
 package AsDynamics;
 
 import java.io.*;
-import java.net.ConnectException;
 import java.net.Socket;
 
 public class Client extends Thread {
@@ -59,9 +58,11 @@ public class Client extends Thread {
             if (this.neighborAsId.equals("")) {
                 this.neighborAsId = updateMessage.substring(0, updateMessage.indexOf('*'));
                 this.as.depositMessage("Client successfully connected with " + neighborAsId + ".");
+                this.as.getLogWriter().writeIntoLog("Client successfully connected with " + neighborAsId + ".");
             }
 
             this.as.depositMessage("New update message from " + this.neighborAsId);
+            this.as.getLogWriter().writeIntoLog("New update message from " + this.neighborAsId);
             this.as.parseUpdateMessage(updateMessage);
         }
     }
@@ -94,8 +95,10 @@ public class Client extends Thread {
 
     private void finishConnection () {
         this.as.depositMessage("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
-        this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
+        this.as.getLogWriter().writeIntoLog("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
+        this.as.deleteAllRoutesWithAS(this.neighborAsId);
         this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
+        this.as.getLogWriter().writeIntoLog("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.kill();
 
     }
@@ -104,13 +107,14 @@ public class Client extends Thread {
     public void run() {
         this.retry = true;
         this.as.depositMessage("Client with AS?? started.");
+        this.as.getLogWriter().writeIntoLog("Client with AS?? started.");
         while (retry){
 
             try {
                 this.sendMessage();
             } catch (IOException e) {
                 if(!this.neighborAsId.equals("")) {
-                    this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
+                    this.finishConnection();
                 }
             }
 
