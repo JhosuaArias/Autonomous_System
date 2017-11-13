@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class Server extends Thread{
+public class Server extends Thread {
 
     private As as;
     private ServerSocket serverSocket;
@@ -32,23 +33,28 @@ public class Server extends Thread{
                 Socket clientSocket = this.serverSocket.accept();
 
                 ServerConnection serverConnection = new ServerConnection(this.as, clientSocket);
-                this.serverConnections.add(serverConnection);
+                synchronized (this) {
+                    this.serverConnections.add(serverConnection);
+                }
                 serverConnection.start();
             } catch (IOException e) {
-               // e.printStackTrace();
                 this.as.getLogWriter().writeIntoLog("Error the server cannot establish a connection");
+            } catch (Exception e) {
+                this.as.getLogWriter().writeIntoLog("Exception not handled: " + Arrays.toString(e.getStackTrace()));
             }
 
         }
 
     }
 
-    void kill() {
+    synchronized void kill() {
 
         for (ServerConnection connection : this.serverConnections) {
-            connection.kill();
-            System.err.println("Server connection: OFF");
-            this.as.getLogWriter().writeIntoLog("Server connection: OFF");
+            if (!connection.closed) {
+                connection.kill();
+                connection.interrupt();
+                this.as.getLogWriter().writeIntoLog("Server connection: OFF");
+            }
         }
 
         this.retry = false;
@@ -58,7 +64,6 @@ public class Server extends Thread{
                 this.serverSocket.close();
                 closed = true;
             } catch (IOException e) {
-                System.err.println("Couldn't close the server socket, retrying...");
                 this.as.getLogWriter().writeIntoLog("Couldn't close the server socket, retrying...");
             }
         }

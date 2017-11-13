@@ -9,9 +9,10 @@ public class ServerConnection extends Thread {
     private Socket clientSocket;
     private boolean retry;
     private String neighborAsId;
+    boolean closed;
 
-    private BufferedReader in;
-    private PrintWriter out;
+    private DataInputStream in;
+    private DataOutputStream out;
 
     ServerConnection (As as, Socket clientSocket) {
         this.as = as;
@@ -23,11 +24,11 @@ public class ServerConnection extends Thread {
     private void listenMessages() throws IOException {
 
         if (this.in == null) {
-            this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+            this.in = new DataInputStream(this.clientSocket.getInputStream());
         }
 
         if (this.out == null) {
-            this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+            this.out = new DataOutputStream(this.clientSocket.getOutputStream());
         }
 
         String updateMessage = null;
@@ -36,7 +37,7 @@ public class ServerConnection extends Thread {
         long currentTime = initialTime;
 
         while (currentTime - initialTime <= 30000 && updateMessage == null) {
-            updateMessage = in.readLine();
+            updateMessage = in.readUTF();
             currentTime = System.currentTimeMillis();
         }
 
@@ -50,7 +51,7 @@ public class ServerConnection extends Thread {
                 this.as.getLogWriter().writeIntoLog("Server successfully connected with " + this.neighborAsId + ".");
             }
 
-            out.println(this.as.getUpdateMessage(updateMessage.substring(0, updateMessage.indexOf('*'))));
+            out.writeUTF (this.as.getUpdateMessage(updateMessage.substring(0, updateMessage.indexOf('*'))));
 
             this.as.depositMessage("New update message from " + this.neighborAsId);
             this.as.getLogWriter().writeIntoLog("New update message from " + this.neighborAsId);
@@ -58,7 +59,7 @@ public class ServerConnection extends Thread {
         }
     }
 
-    void kill() {
+    synchronized void kill() {
 
         if (this.in != null) {
             try {
@@ -69,7 +70,11 @@ public class ServerConnection extends Thread {
         }
 
         if (this.out != null) {
-            this.out.close();
+            try {
+                this.out.close();
+            } catch (IOException e) {
+                //Do nothing
+            }
         }
 
         if (this.clientSocket != null) {
@@ -81,6 +86,7 @@ public class ServerConnection extends Thread {
         }
 
         this.retry = false;
+        this.closed = true;
 
     }
 
@@ -88,7 +94,7 @@ public class ServerConnection extends Thread {
 
         this.as.depositMessage("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
         this.as.getLogWriter().writeIntoLog("Client of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
+        this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
         this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.as.getLogWriter().writeIntoLog("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
         this.kill();
@@ -105,13 +111,11 @@ public class ServerConnection extends Thread {
             try {
                 this.listenMessages();
             } catch (IOException e) {
-                if(!this.neighborAsId.equals("")) {
-                    this.finishConnection();
-                }
+                this.finishConnection();
             }
 
             try {
-                Thread.sleep(20000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
                 //Nothing should happen
             }

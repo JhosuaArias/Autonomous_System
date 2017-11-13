@@ -49,12 +49,11 @@ public class As {
 
         if (this.listenerServer != null) {
             this.listenerServer.kill();
-            System.err.println("Listener server: OFF");
         }
 
         for (Client client : this.clients) {
             client.kill();
-            System.err.println("Client: OFF");
+            client.interrupt();
         }
 
         logWriter.close();

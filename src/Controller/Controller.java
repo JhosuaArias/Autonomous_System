@@ -48,6 +48,12 @@ public class Controller {
 
         // the "stop" command was used
         this.stopCommand();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            //Do nothing
+        }
+        System.exit(0);
     }
 
     private void parseCommand(String command, Terminal terminal) {

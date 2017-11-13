@@ -13,8 +13,8 @@ public class Client extends Thread {
     private String neighborAsId;
     private boolean retry;
 
-    private BufferedReader in;
-    private PrintWriter out;
+    private DataInputStream in;
+    private DataOutputStream out;
 
     Client(As as, String ip, int port) {
 
@@ -33,26 +33,26 @@ public class Client extends Thread {
         }
 
         if (this.in == null) {
-            this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+            this.in = new DataInputStream(this.clientSocket.getInputStream());
         }
 
         if (this.out == null) {
-            this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+            this.out = new DataOutputStream(this.clientSocket.getOutputStream());
         }
 
-        this.out.println(this.as.getUpdateMessage(this.neighborAsId));
+        this.out.writeUTF(this.as.getUpdateMessage(this.neighborAsId));
         String updateMessage = null;
 
         long initialTime = System.currentTimeMillis();
         long currentTime = initialTime;
 
         while (currentTime - initialTime <= 30000 && updateMessage == null) {
-            updateMessage = this.in.readLine();
+            updateMessage = this.in.readUTF();
             currentTime = System.currentTimeMillis();
         }
 
         if (updateMessage == null) {
-            this.finishConnection();
+            throw new IOException();
         } else {
 
             if (this.neighborAsId.equals("")) {
@@ -67,7 +67,7 @@ public class Client extends Thread {
         }
     }
 
-    void kill() {
+    synchronized void kill() {
 
         if (this.in != null) {
             try {
@@ -78,7 +78,11 @@ public class Client extends Thread {
         }
 
         if (this.out != null) {
-            this.out.close();
+            try {
+                this.out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (this.clientSocket != null) {
@@ -93,14 +97,19 @@ public class Client extends Thread {
 
     }
 
-    private void finishConnection () {
-        this.as.depositMessage("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
-        this.as.getLogWriter().writeIntoLog("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, finishing connection.");
-        this.as.deleteAllRoutesWithAS(this.neighborAsId);
-        this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
-        this.as.getLogWriter().writeIntoLog("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
-        this.kill();
+    private void handleNoConnection() {
+        this.as.depositMessage("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, retrying connection.");
+        this.as.getLogWriter().writeIntoLog("Server of " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " didn't respond, retrying connection.");
 
+        if(!this.neighborAsId.equals("")) {
+            this.as.deleteAllRoutesPropagatedByAS(this.neighborAsId);
+            this.as.depositMessage("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
+            this.as.getLogWriter().writeIntoLog("All routes with " + (this.neighborAsId.equals("")? "AS??":this.neighborAsId) + " have been deleted.");
+        }
+
+        this.clientSocket = null;
+        this.in = null;
+        this.out = null;
     }
 
     @Override
@@ -113,13 +122,11 @@ public class Client extends Thread {
             try {
                 this.sendMessage();
             } catch (IOException e) {
-                if(!this.neighborAsId.equals("")) {
-                    this.finishConnection();
-                }
+                this.handleNoConnection();
             }
 
             try {
-                Thread.sleep(20000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
                 //Nothing should happen
             }

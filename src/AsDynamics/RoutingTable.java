@@ -85,7 +85,7 @@ class RoutingTable {
             for (ArrayList<String> path : possiblePathsCopy) {
 
                 //If the last AS in the path is not the AS we are looking for, put it back in the list
-                if (path.size() > 0 && !path.get(path.size()-1).equals(asID)) {
+                if (path.size() > 0 && !path.get(0).equals(asID)) {
                     possiblePaths.add(path);
                 }
 
